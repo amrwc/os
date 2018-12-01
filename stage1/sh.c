@@ -181,12 +181,12 @@ int getcmd(char *buf, int nbuf)
 
 int main(void)
 {
-	static char buf[100];
+	static char buf[100]; // Since it's static, it's filled with zeros.
 
 	// Read and run input commands.
 	while (getcmd(buf, sizeof(buf)) >= 0) 
 	{
-		if (buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' ') 
+		if (buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' ')
 		{
 			// Chdir must be called by the parent, not the child.
 			buf[strlen(buf) - 1] = 0;  // chop \n
@@ -194,12 +194,12 @@ int main(void)
 			continue;
 		}
     // Empty cd -- change cwd to '/' (root).
-		// if (buf[0] == 'c' && buf[1] == 'd') 
-		// {
-    //   char slash = '/';
-		// 	changeDirectory(&slash);
-		// 	continue;
-		// }
+		if (buf[0] == 'c' && buf[1] == 'd' && buf[2] == '\n')
+		{
+      static char emptyChar;
+      changeDirectory(&emptyChar);
+			continue;
+		}
 		if (fork1() == 0)
 		{
 			runcmd(parsecmd(buf));

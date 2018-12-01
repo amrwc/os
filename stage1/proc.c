@@ -608,21 +608,24 @@ void processDump(void)
 
 int chdir(char* directory)
 {
-  /** TODO:
-      * make empty cd work, or remove it;
-  */
+  if (!directory) return -1; // if (directory == NULL)
+
   int dirLen = strlen(directory);
-  if (dirLen <= 0) return -1;
+
+  if (dirLen < 0) return -1;
+  // If directory starts with a slash
+  if (directory[0] == '/' || directory[0] == '\\') return -1;
 
   char *cwd = myProcess()->Cwd;
 
   // Empty cd -- go to the root.
-  if (directory[0] == '/' && dirLen == 1)
+  if (dirLen == 0)
   {
-    char buffer[255];
+    static char buffer[255];
     buffer[0] = '/';
 
-    memmove(cwd, &buffer, 255);
+    memmove(cwd, &buffer, 255); // TODO: Ask Wayne: which one should I use?
+    // safestrcpy(cwd, buffer, 255); // This one doesn't replace old values.
 
     return 0;
   }
@@ -634,18 +637,22 @@ int chdir(char* directory)
 
     // Append slash to the currDir.
     memmove(directory + dirLen, &slash, 1);
+    // safestrcpy(directory + dirLen, &slash, 1); // Doesn't work.
+    // safestrcpy(directory + dirLen + 1, &slash, 1); // Doesn't work.
   }
 
   // Append directory to cwd.
   memmove(cwd + strlen(cwd), directory, strlen(directory));
+  // safestrcpy(cwd + strlen(cwd), directory, strlen(directory)); // No slash at the end.
+  // safestrcpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Completely breaks.
 
   return 0;
 }
 
 int getcwd(char* currentDirectory, int sizeOfBuffer)
 {
-  if (sizeOfBuffer <= 0) return -1;
-  if (strlen(currentDirectory) < 0) return -1;
+  if (!currentDirectory || !sizeOfBuffer) return -1;
+  if (strlen(currentDirectory) < 0 || sizeOfBuffer <= 0) return -1;
 
   char *cwd = myProcess()->Cwd;
 
