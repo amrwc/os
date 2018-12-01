@@ -609,28 +609,35 @@ void processDump(void)
 int chdir(char* directory)
 {
   /** TODO:
-      * check if the currDir is the same as the newDir;
-      * if the newDir is shorter than currDir, pad out the buffer with zeros;
-      * if newDir is of length 0, return -1;
+      * make empty cd work, or remove it;
   */
+  int dirLen = strlen(directory);
+  if (dirLen <= 0) return -1;
 
-  Process *currProc = myProcess();
-  // char currentDir[255] = p->Cwd;
-  // char newDir[255] = directory;
-  // char *currentDir = p->Cwd;
-  // char *desiredDir = directory;
-  char currentDir[200];
-  char desiredDir[200];
-  char newDir[200];
+  char *cwd = myProcess()->Cwd;
 
-  strcpy(currentDir, currProc->Cwd);
-  strcpy(desiredDir, directory);
+  // Empty cd -- go to the root.
+  if (directory[0] == '/' && dirLen == 1)
+  {
+    char buffer[255];
+    buffer[0] = '/';
 
-  // char *newDir = strcpy(currentDir, desiredDir);
-  strcpy(newDir, currentDir);
-  strncpy(newDir, desiredDir, strlen(desiredDir));
+    memmove(cwd, &buffer, 255);
 
-  strncpy(currProc->Cwd, newDir, strlen(newDir));
+    return 0;
+  }
+
+  // If directory doesn't end with a slash
+  if (directory[dirLen - 1] != '\\' && directory[dirLen - 1] != '/')
+  {
+    char slash = '/';
+
+    // Append slash to the currDir.
+    memmove(directory + dirLen, &slash, 1);
+  }
+
+  // Append directory to cwd.
+  memmove(cwd + strlen(cwd), directory, strlen(directory));
 
   return 0;
 }
@@ -640,21 +647,10 @@ int getcwd(char* currentDirectory, int sizeOfBuffer)
   if (sizeOfBuffer <= 0) return -1;
   if (strlen(currentDirectory) < 0) return -1;
 
-  Process *currProc = myProcess(); // Store information about the current process.
+  char *cwd = myProcess()->Cwd;
 
-  safestrcpy(currentDirectory, currProc->Cwd, sizeOfBuffer); // This one works.
-  // strncpy(currentDirectory, currProc->Cwd, sizeOfBuffer); // This one also works.
-
-  int cwdLen = strlen(currProc->Cwd);
-
-  // If the currentDirectory doesn't end with a slash
-  if (currentDirectory[cwdLen - 1] != '\\' && currentDirectory[cwdLen - 1] != '/')
-  {
-    char slash = '/';
-
-    // Append slash to the currDir.
-    memmove(currentDirectory + cwdLen, &slash, 1);
-  }
+  safestrcpy(currentDirectory, cwd, sizeOfBuffer); // This one works.
+  // strncpy(currentDirectory, cwd, sizeOfBuffer); // This one also works.
 
   return 0;
 }

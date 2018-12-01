@@ -150,13 +150,11 @@ void runcmd(struct cmd *cmd)
 
 void changeDirectory(char * path)
 {
-	// TODO:  Add call to chdir here
   chdir(path);
 }
 
 void getCurrentDirectory(char * buffer, int bufferSize)
 {
-	// TODO: Change this function to use call to getcwd
 	buffer[0] = 0;
 
   getcwd(buffer, bufferSize);
@@ -165,7 +163,6 @@ void getCurrentDirectory(char * buffer, int bufferSize)
 // getcwd returns cwd in buffer, which is printed to the console,
 // and then memset is overriding buf with zeros from left
 // nbuf times to wipe it. See main() below.
-
 // It's being called right at the start of shell.
 int getcmd(char *buf, int nbuf)
 {
@@ -196,6 +193,13 @@ int main(void)
 			changeDirectory(buf + 3);  // Point at what's after 'cd '.
 			continue;
 		}
+    // Empty cd -- change cwd to '/' (root).
+		// if (buf[0] == 'c' && buf[1] == 'd') 
+		// {
+    //   char slash = '/';
+		// 	changeDirectory(&slash);
+		// 	continue;
+		// }
 		if (fork1() == 0)
 		{
 			runcmd(parsecmd(buf));
