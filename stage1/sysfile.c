@@ -248,26 +248,42 @@ int sys_pipe(void)
 
 int sys_chdir(void)
 {
-  char *path;
+  char* directory;          // 1st argument storage.
 
-  if (argstr(0, &path) < 1) 
-	{
-		return -1;
-	}
+  // Store the first (0) argument of size char in directory.
+  argptr(0, &directory, sizeof(char)); // TODO: potential pitfall?
 
-  int pathLen = strlen(path);
-  if (path[pathLen - 1] != '/' && path[pathLen - 1] != '\\')
-  {
-    // TODO: concatinating the thing.
-    path += '/';
-  }
-
+  // Call chdir from proc.c file.
+  chdir(directory);
+  
   return 0;
 }
 
 int sys_getcwd(void)
 {
+  char* currentDirectory;   // 1st argument storage.
+  int sizeOfBuffer;         // 2nd argument storage.
 
+  // Take 1st(0) argument from stack of type pointer,
+  // and store it in currentDirectory.
+  argptr(0, &currentDirectory, sizeof(char)); // TODO: potential pitfall?
+
+  // if (strlen(*currentDirectory) < 0)       // TODO: redundant checks in here?
+  // {
+  //   return -1;
+  // }
+
+  // Take 2nd(1) argument from stack of type int,
+  // and store it in sizeOfBuffer.
+  argint(1, &sizeOfBuffer);
+
+  // if (sizeOfBuffer <= 0)
+  // {
+  //   return -1;
+  // }
+
+  // Call getcwd from proc.c file.
+  getcwd(currentDirectory, sizeOfBuffer);
 
   return 0;
 }
