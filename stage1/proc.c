@@ -608,6 +608,7 @@ void processDump(void)
 
 int chdir(char* directory)
 {
+  // TODO: Ask Wayne: Should I use string methods instead of memmove()? What are the implications?
   if (!directory) return -1; // if (directory == NULL)
 
   int dirLen = strlen(directory);
@@ -624,8 +625,9 @@ int chdir(char* directory)
     static char buffer[255];
     buffer[0] = '/';
 
-    memmove(cwd, &buffer, 255); // TODO: Ask Wayne: which one should I use?
+    memmove(cwd, &buffer, 255);
     // safestrcpy(cwd, buffer, 255); // This one doesn't replace old values.
+    // strncpy(cwd, buffer, 255); // THIS ONE WORKS.
 
     return 0;
   }
@@ -639,12 +641,17 @@ int chdir(char* directory)
     memmove(directory + dirLen, &slash, 1);
     // safestrcpy(directory + dirLen, &slash, 1); // Doesn't work.
     // safestrcpy(directory + dirLen + 1, &slash, 1); // Doesn't work.
+    // strncpy(directory + dirLen, &slash, 1); // THIS ONE WORKS.
+    // strcpy(directory + dirLen, &slash); // Produces weird output.
   }
 
   // Append directory to cwd.
   memmove(cwd + strlen(cwd), directory, strlen(directory));
   // safestrcpy(cwd + strlen(cwd), directory, strlen(directory)); // No slash at the end.
   // safestrcpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Completely breaks.
+  // strncpy(cwd + strlen(cwd), directory, strlen(directory)); // Doesn't work.
+  // strncpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Doesn't work.
+  // strcpy(cwd + strlen(cwd), directory); // THIS ONE WORKS.
 
   return 0;
 }
