@@ -196,15 +196,6 @@ int main(void)
 			changeDirectory(buf + 3);  // Point at what's after 'cd '.
 			continue;
 		}
-    // TODO: ls prototype -- it's for testing, remove later.
-    // An attempt to replicate getcmd's first few lines.
-    if (buf[0] == 'l' && buf[1] == 's')
-    {
-      char buffer[255];
-
-      getCurrentDirectory(buffer, 255);
-      printf("%s$ ", buffer);
-    }
 		if (fork1() == 0)
 		{
 			runcmd(parsecmd(buf));
