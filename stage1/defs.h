@@ -114,6 +114,8 @@ void						initialiseFirstUserProcess(void);
 int							wait(void);
 void						wakeup(void*);
 void						yield(void);
+int             chdir(char*);
+int             getcwd(char*, int);
 
 // swtch.asm
 void						swtch(Context**, Context*);
