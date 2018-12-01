@@ -158,8 +158,15 @@ void getCurrentDirectory(char * buffer, int bufferSize)
 {
 	// TODO: Change this function to use call to getcwd
 	buffer[0] = 0;
+
+  getcwd(buffer, bufferSize);
 }
 
+// getcwd returns cwd in buffer, which is printed to the console,
+// and then memset is overriding buf with zeros from left
+// nbuf times to wipe it. See main() below.
+
+// It's being called right at the start of shell.
 int getcmd(char *buf, int nbuf)
 {
 	char buffer[255];
@@ -189,6 +196,15 @@ int main(void)
 			changeDirectory(buf + 3);  // Point at what's after 'cd '.
 			continue;
 		}
+    // TODO: ls prototype -- it's for testing, remove later.
+    // An attempt to replicate getcmd's first few lines.
+    if (buf[0] == 'l' && buf[1] == 's')
+    {
+      char buffer[255];
+
+      getCurrentDirectory(buffer, 255);
+      printf("%s$ ", buffer);
+    }
 		if (fork1() == 0)
 		{
 			runcmd(parsecmd(buf));

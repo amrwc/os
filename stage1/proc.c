@@ -608,41 +608,70 @@ void processDump(void)
 
 int chdir(char* directory)
 {
-  Process *p = myProcess();
+  Process *currProc = myProcess();
   // char currentDir[255] = p->Cwd;
   // char newDir[255] = directory;
   // char *currentDir = p->Cwd;
   // char *desiredDir = directory;
-  char currentDir[40];
-  strcpy(currentDir, p->Cwd);
-  char desiredDir[40];
+  char currentDir[200];
+  char desiredDir[200];
+  char newDir[200];
+
+  strcpy(currentDir, currProc->Cwd);
   strcpy(desiredDir, directory);
-  int desiredDirLength = strlen(desiredDir);
 
   // char *newDir = strcpy(currentDir, desiredDir);
-  char newDir[40];
   strcpy(newDir, currentDir);
-  strncpy(newDir, desiredDir, desiredDirLength);
+  strncpy(newDir, desiredDir, strlen(desiredDir));
 
-  int newDirLength = strlen(newDir);
-  strncpy(p->Cwd, newDir, newDirLength);
-  
+  strncpy(currProc->Cwd, newDir, strlen(newDir));
+
   return 0;
 }
 
 int getcwd(char* currentDirectory, int sizeOfBuffer)
 {
-  if (sizeOfBuffer <= 0)
-  {
-    return -1;
-  }
+  Process *currProc = myProcess(); // Store information about the current process.
+  // TODO: Error checking.
+  // if (sizeOfBuffer <= 0)
+  // {
+  //   return -1;
+  // }
 
-  if (strlen(currentDirectory) <= 0)
-  {
-    return -1;
-  }
+  // if (strlen(currentDirectory) <= 0)
+  // {
+  //   return -1;
+  // }
 
-  safestrcpy(currentDirectory, myProcess()->Cwd, sizeOfBuffer);
+  // TODO: potential pitfall?
+  // safestrcpy(currentDirectory, myProcess()->Cwd, sizeOfBuffer);
+  strncpy(currentDirectory, currProc->Cwd, sizeOfBuffer);
+  // strcpy(currentDirectory, myProcess()->Cwd);
+
+  // int cwdLen = strlen(currentDirectory);
+
+  // If the currentDirectory doesn't end with a slash
+  // '- 2': null terminator and 0-index fix.
+  // if (currentDirectory[cwdLen - 2] != '\\' || currentDirectory[cwdLen - 2] != '/')
+  // {
+  //   //strcpy?
+  //   // cprintf(currentDirectory);
+
+  //   int slash = 47;
+  //   // char *pslash = &slash;
+  //   memmove(currentDirectory + cwdLen, (int*)slash, 2); // 2: length of slash + null terminator.
+  // }
 
   return 0;
 }
+
+// char* concat(const char *s1, const char *s2)
+// {
+//     const size_t len1 = strlen(s1);
+//     const size_t len2 = strlen(s2);
+//     char *result = malloc(len1 + len2 + 1); // +1 for the null-terminator
+//     // in real code you would check for errors in malloc here
+//     memcpy(result, s1, len1);
+//     memcpy(result + len1, s2, len2 + 1); // +1 to copy the null-terminator
+//     return result;
+// }
