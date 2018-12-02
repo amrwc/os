@@ -84,6 +84,9 @@ void						localApicInitialise(void);
 void						localApicStartup(uint8_t, uint32_t);
 void						microDelay(int);
 
+// ls.c
+// TODO:
+
 // mp.c
 extern int					ismp;
 void						mpinit(void);
