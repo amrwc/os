@@ -632,8 +632,40 @@ int chdir(char* directory)
     return 0;
   }
 
+  // cd .. -- get to the upper directory.
+  // if (directory[0] == '.' && directory[1] == '.' && dirLen == 2)
+  // {
+  //   int cwdLen = strlen(cwd);
+
+  //   if (cwdLen <= 1) return -1; // If in root, break.
+
+  //   char cwdCopy[cwdLen];
+  //   safestrcpy(cwdCopy, cwd, cwdLen); // TODO: Which one of these works?
+  //   // memmove(cwdCopy, cwd, cwdLen);
+  //   // strncpy(cwdCopy, cwd, cwdLen);
+  //   // strcpy(cwdCopy, cwd);
+
+  //   // For each character in cwd until root...
+  //   // i: cwdLen - (0-index) - (slash at the end)
+  //   for (int i = cwdLen - 2; i > 1; i--)
+  //   {
+  //     // ... if the current character is a slash...
+  //     if (cwdCopy[i] == '/' || cwdCopy[i] == '\\') //TODO: Blows up here.
+  //     {
+  //       char newDir[i + 1]; // +1 to account for 0-index.
+
+  //       memmove(&newDir, cwdCopy, i + 1);
+  //       memmove(directory, newDir, strlen(newDir));
+
+  //       return 0;
+  //     }
+  //   }
+
+  //   return -1;
+  // }
+
   // If directory doesn't end with a slash
-  if (directory[dirLen - 1] != '\\' && directory[dirLen - 1] != '/')
+  if (directory[dirLen - 1] != '/' && directory[dirLen - 1] != '\\')
   {
     char slash = '/';
 
