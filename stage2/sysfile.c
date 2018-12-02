@@ -277,3 +277,24 @@ int sys_getcwd(void)
 
   return 0;
 }
+
+int sys_opendir(void)
+{
+  // TODO:
+
+  return 0;
+}
+
+int sys_readdir(void)
+{
+  // TODO:
+
+  return 0;
+}
+
+int sys_closedir(void)
+{
+  // TODO:
+
+  return 0;
+}
