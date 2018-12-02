@@ -25,9 +25,10 @@ int sleep(int);
 int uptime(void);
 int chdir(char*);
 int getcwd(char*, int);
-int opendir(char*);
-int readdir(int, struct _DirectoryEntry*);
-int closedir(int);
+// int opendir(char*);
+// int readdir(int, struct _DirectoryEntry*); // Throws: `declared inside parameter list will not be visible outside of this definition or declaration`
+// int closedir(int);
+int ls(char*);
 
 // The following are C standard library functions implemented in our
 // equivalent of the C run-time library

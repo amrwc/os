@@ -1,8 +1,30 @@
-// TODO: #include
+#include "types.h"
+#include "user.h"
 
-int main (int argc, char *argv[])
+int opendir(char *directory)
 {
-  // TODO:
+
+
+  return 0;
+}
+
+int readdir(int directoryDescriptor, struct _DirectoryEntry * dirEntry)
+{
+
+
+  return 0;
+}
+
+int closedir(int directoryDescriptor)
+{
+
+
+  return 0;
+}
+
+int ls (char *path)
+{
+
 
   return 0;
 }
