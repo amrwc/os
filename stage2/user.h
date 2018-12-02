@@ -25,6 +25,9 @@ int sleep(int);
 int uptime(void);
 int chdir(char*);
 int getcwd(char*, int);
+int opendir(char*);
+int readdir(int, struct _DirectoryEntry*);
+int closedir(int);
 
 // The following are C standard library functions implemented in our
 // equivalent of the C run-time library
