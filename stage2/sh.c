@@ -160,6 +160,11 @@ void getCurrentDirectory(char * buffer, int bufferSize)
   getcwd(buffer, bufferSize);
 }
 
+void listFiles(char *path)
+{
+  ls(path); // TODO: Throws `undefined reference to 'ls'`
+}
+
 // getcwd returns cwd in buffer, which is printed to the console,
 // and then memset is overriding buf with zeros from left
 // nbuf times to wipe it. See main() below.
@@ -200,6 +205,13 @@ int main(void)
       changeDirectory(&emptyChar);
 			continue;
 		}
+    // ls
+    if (buf[0] == 'l' && buf[1] == 's' && buf[2] == ' ')
+    {
+      buf[strlen(buf) - 1] = 0;  // chop \n
+      listFiles(buf + 3);
+			continue;
+    }
 		if (fork1() == 0)
 		{
 			runcmd(parsecmd(buf));
