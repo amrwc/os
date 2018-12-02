@@ -85,7 +85,9 @@ void						localApicStartup(uint8_t, uint32_t);
 void						microDelay(int);
 
 // ls.c
-// TODO:
+int opendir(char*);
+int readdir(int, struct _DirectoryEntry*);
+int closedir(int);
 
 // mp.c
 extern int					ismp;
