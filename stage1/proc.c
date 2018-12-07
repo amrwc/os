@@ -608,7 +608,6 @@ void processDump(void)
 
 int chdir(char* directory)
 {
-  // TODO: Ask Wayne: Should I use string methods instead of memmove()? What are the implications?
   if (!directory) return -1; // if (directory == NULL)
 
   int dirLen = strlen(directory);
@@ -625,9 +624,7 @@ int chdir(char* directory)
     static char buffer[MAXCWDSIZE];
     buffer[0] = '/';
 
-    memmove(cwd, &buffer, MAXCWDSIZE);
-    // safestrcpy(cwd, buffer, 255); // This one doesn't replace old values.
-    // strncpy(cwd, buffer, 255); // THIS ONE WORKS.
+    safestrcpy(cwd, buffer, MAXCWDSIZE);
 
     return 0;
   }
@@ -671,23 +668,12 @@ int chdir(char* directory)
   // If directory doesn't end with a slash...
   if (directory[dirLen - 1] != '/' && directory[dirLen - 1] != '\\')
   {
-    char slash = '/';
-
     // ...append slash to the currDir.
-    memmove(directory + dirLen, &slash, 1);
-    // safestrcpy(directory + dirLen, &slash, 1); // Doesn't work.
-    // safestrcpy(directory + dirLen + 1, &slash, 1); // Doesn't work.
-    // strncpy(directory + dirLen, &slash, 1); // THIS ONE WORKS.
-    // strcpy(directory + dirLen, &slash); // Produces weird output.
+    directory[dirLen] = '/';
   }
 
   // Append directory to cwd.
-  memmove(cwd + strlen(cwd), directory, strlen(directory));
-  // safestrcpy(cwd + strlen(cwd), directory, strlen(directory)); // No slash at the end.
-  // safestrcpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Completely breaks.
-  // strncpy(cwd + strlen(cwd), directory, strlen(directory)); // Doesn't work.
-  // strncpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Doesn't work.
-  // strcpy(cwd + strlen(cwd), directory); // THIS ONE WORKS.
+  safestrcpy(cwd + strlen(cwd), directory, strlen(directory) + 1);
 
   return 0;
 }
@@ -699,8 +685,7 @@ int getcwd(char* currentDirectory, int sizeOfBuffer)
 
   char *cwd = myProcess()->Cwd;
 
-  safestrcpy(currentDirectory, cwd, sizeOfBuffer); // This one works.
-  // strncpy(currentDirectory, cwd, sizeOfBuffer); // This one also works.
+  safestrcpy(currentDirectory, cwd, sizeOfBuffer);
 
   return 0;
 }
