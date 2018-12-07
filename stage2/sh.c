@@ -193,6 +193,8 @@ int main(void)
 	{
 		if (buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' ')
 		{
+      if (buf[3] == ' ') continue;
+
 			// Chdir must be called by the parent, not the child.
 			buf[strlen(buf) - 1] = 0;  // chop \n
 			changeDirectory(buf + 3);  // Point at what's after 'cd '.

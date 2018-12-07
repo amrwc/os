@@ -608,7 +608,6 @@ void processDump(void)
 
 int chdir(char* directory)
 {
-  // TODO: Ask Wayne: Should I use string methods instead of memmove()? What are the implications?
   if (!directory) return -1; // if (directory == NULL)
 
   int dirLen = strlen(directory);
@@ -622,68 +621,59 @@ int chdir(char* directory)
   // Empty cd -- go to the root.
   if (dirLen == 0)
   {
-    static char buffer[255];
+    static char buffer[MAXCWDSIZE];
     buffer[0] = '/';
 
-    memmove(cwd, &buffer, 255);
-    // safestrcpy(cwd, buffer, 255); // This one doesn't replace old values.
-    // strncpy(cwd, buffer, 255); // THIS ONE WORKS.
+    safestrcpy(cwd, buffer, MAXCWDSIZE);
 
     return 0;
   }
 
   // cd .. -- get to the upper directory.
-  // if (directory[0] == '.' && directory[1] == '.' && dirLen == 2)
-  // {
-  //   int cwdLen = strlen(cwd);
+  if (directory[0] == '.' && directory[1] == '.' && dirLen == 2)
+  {
+    int cwdLen = strlen(cwd);
 
-  //   if (cwdLen <= 1) return -1; // If in root, break.
+    if (cwdLen <= 1) return 0; // If in root, break.
 
-  //   char cwdCopy[cwdLen];
-  //   safestrcpy(cwdCopy, cwd, cwdLen); // TODO: Which one of these works?
-  //   // memmove(cwdCopy, cwd, cwdLen);
-  //   // strncpy(cwdCopy, cwd, cwdLen);
-  //   // strcpy(cwdCopy, cwd);
+    // For each character in cwd until root...
+    // i:= cwdLen - (0-index) - (slash at the end)
+    for (int i = cwdLen - 2; i > 0; i--)
+    {
+      // ... if the current character is a slash, return.
+      if (cwd[i] == '/' || cwd[i] == '\\') return 0;
 
-  //   // For each character in cwd until root...
-  //   // i: cwdLen - (0-index) - (slash at the end)
-  //   for (int i = cwdLen - 2; i > 1; i--)
-  //   {
-  //     // ... if the current character is a slash...
-  //     if (cwdCopy[i] == '/' || cwdCopy[i] == '\\') //TODO: Blows up here.
-  //     {
-  //       char newDir[i + 1]; // +1 to account for 0-index.
+      cwd[i] = 0; // Chip away the last character of cwd.
+    }
 
-  //       memmove(&newDir, cwdCopy, i + 1);
-  //       memmove(directory, newDir, strlen(newDir));
+    // Loop passed without returning -- something is wrong, return error.
+    return -1;
+  }
 
-  //       return 0;
-  //     }
-  //   }
+  // If directory ends with a space...
+  if (directory[dirLen - 1] == ' ')
+  {
+    // ...chip the spaces away...
+    for (int i = dirLen - 1; i > 0; i--)
+    {
+      if (directory[i] != ' ') break;
 
-  //   return -1;
-  // }
+      directory[i] = 0;
+    }
 
-  // If directory doesn't end with a slash
+    // ...and update the dirLen variable.
+    dirLen = strlen(directory);
+  }
+
+  // If directory doesn't end with a slash...
   if (directory[dirLen - 1] != '/' && directory[dirLen - 1] != '\\')
   {
-    char slash = '/';
-
-    // Append slash to the currDir.
-    memmove(directory + dirLen, &slash, 1);
-    // safestrcpy(directory + dirLen, &slash, 1); // Doesn't work.
-    // safestrcpy(directory + dirLen + 1, &slash, 1); // Doesn't work.
-    // strncpy(directory + dirLen, &slash, 1); // THIS ONE WORKS.
-    // strcpy(directory + dirLen, &slash); // Produces weird output.
+    // ...append slash to the currDir.
+    directory[dirLen] = '/';
   }
 
   // Append directory to cwd.
-  memmove(cwd + strlen(cwd), directory, strlen(directory));
-  // safestrcpy(cwd + strlen(cwd), directory, strlen(directory)); // No slash at the end.
-  // safestrcpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Completely breaks.
-  // strncpy(cwd + strlen(cwd), directory, strlen(directory)); // Doesn't work.
-  // strncpy(cwd + strlen(cwd) + 1, directory, strlen(directory)); // Doesn't work.
-  // strcpy(cwd + strlen(cwd), directory); // THIS ONE WORKS.
+  safestrcpy(cwd + strlen(cwd), directory, strlen(directory) + 1);
 
   return 0;
 }
@@ -695,8 +685,7 @@ int getcwd(char* currentDirectory, int sizeOfBuffer)
 
   char *cwd = myProcess()->Cwd;
 
-  safestrcpy(currentDirectory, cwd, sizeOfBuffer); // This one works.
-  // strncpy(currentDirectory, cwd, sizeOfBuffer); // This one also works.
+  safestrcpy(currentDirectory, cwd, sizeOfBuffer);
 
   return 0;
 }
