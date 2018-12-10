@@ -1,4 +1,5 @@
 struct _Stat;
+struct _DirectoryEntry;
 
 // System calls.  If you add any new system calls to UoDOS, the signature of the calls for
 // user programs should be added here, as well as adding them to syscalls.pl.
@@ -25,10 +26,9 @@ int sleep(int);
 int uptime(void);
 int chdir(char*);
 int getcwd(char*, int);
-// int opendir(char*);
-// int readdir(int, struct _DirectoryEntry*); // Throws: `declared inside parameter list will not be visible outside of this definition or declaration`
-// int closedir(int);
-int ls(char*);
+int opendir(char*);
+int readdir(int, struct _DirectoryEntry*); // Throws: `declared inside parameter list will not be visible outside of this definition or declaration`
+int closedir(int);
 
 // The following are C standard library functions implemented in our
 // equivalent of the C run-time library
