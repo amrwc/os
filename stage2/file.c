@@ -6,6 +6,9 @@
 #include "sleeplock.h"
 #include "file.h"
 
+#include "mmu.h"
+#include "proc.h"
+
 Device devices[NDEV];
 
 struct
@@ -148,3 +151,53 @@ int fileWrite(File *f, char *addr, int n)
 	panic("fileWrite");
 }
 
+// Allocate a file descriptor for the given file and
+// store it in the process table for the current process.
+static int fdAllocate(File *f)
+{
+	int fd;
+	Process *curproc = myProcess();
+
+	for (fd = 0; fd < NOFILE; fd++) 
+	{
+		if (curproc->OpenFile[fd] == 0) 
+		{
+			curproc->OpenFile[fd] = f;
+			return fd;
+		}
+	}
+	return -1;
+}
+
+int opendir(char *directory)
+{
+  int isSubdirectory = strlen(directory) == 0 ? 0 : 1;
+
+  char *cwd = myProcess()->Cwd;
+  File *file = fsFat12Open(cwd, directory, isSubdirectory);
+
+  if (file == 0) return 0; // Return error.
+
+  return fdAllocate(file);
+}
+
+int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
+{
+  File *file = myProcess()->OpenFile[directoryDescriptor];
+  char buffer[32];
+
+  if (fileRead(file, buffer, 32) < 0) return -1;
+
+  memmove(dirEntry, buffer, 32);
+
+  return 0;
+}
+
+int closedir(int directoryDescriptor)
+{
+  fileClose(myProcess()->OpenFile[directoryDescriptor]);
+
+  if (myProcess()->OpenFile[directoryDescriptor]) return -1;
+
+  return 0;
+}

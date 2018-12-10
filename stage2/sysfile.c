@@ -280,21 +280,35 @@ int sys_getcwd(void)
 
 int sys_opendir(void)
 {
-  // TODO:
+  char* directory;
+
+  argptr(0, &directory, sizeof(int8_t));
+
+  opendir(directory);
 
   return 0;
 }
 
 int sys_readdir(void)
 {
-  // TODO:
+  int directoryDescriptor;
+  struct _DirectoryEntry * dirEntry;
+
+  argint(0, &directoryDescriptor);
+  argptr(1, (void*)&dirEntry, sizeof(*dirEntry));
+
+  readdir(directoryDescriptor, dirEntry);
 
   return 0;
 }
 
 int sys_closedir(void)
 {
-  // TODO:
+  int directoryDescriptor;
+
+  argint(0, &directoryDescriptor);
+
+  closedir(directoryDescriptor);
 
   return 0;
 }
