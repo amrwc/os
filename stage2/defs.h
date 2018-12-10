@@ -49,6 +49,9 @@ void						filesInitialise(void);
 int							fileRead(File*, char*, int n);
 int							fileStat(File*, Stat*);
 int							fileWrite(File*, char*, int n);
+int             opendir(char*);
+int             readdir(int, struct _DirectoryEntry*);
+int             closedir(int);
 
 // fs.c
 void						fsFat12Initialise(void);
@@ -83,11 +86,6 @@ void						localApicEndOfInterrupt(void);
 void						localApicInitialise(void);
 void						localApicStartup(uint8_t, uint32_t);
 void						microDelay(int);
-
-// ls.c
-int opendir(char*);
-int readdir(int, struct _DirectoryEntry*);
-int closedir(int);
 
 // mp.c
 extern int					ismp;
