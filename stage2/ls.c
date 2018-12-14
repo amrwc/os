@@ -4,10 +4,16 @@
 
 int openDirectory(char *directory)
 {
-  // opendir(argv[0]);
+  printf("ls.c->openDirectory()->directory: %s\n", directory);
 
-  // return 0;
-  return opendir(directory);
+  int dirDescriptor = opendir(directory);
+
+  if (dirDescriptor == 0)
+  {
+    printf("ls.c->openDirectory()->dirDescriptor == 0\n");
+  }
+
+  return dirDescriptor;
 }
 
 int readDirectory(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
@@ -26,10 +32,16 @@ int closeDirectory(int directoryDescriptor)
 
 int main(int argc, char *argv[])
 {
-  int dirDescriptor = openDirectory(argv[0]);
-  if (dirDescriptor == 0) return -1;
+  int dirDescriptor = openDirectory(argv[1]);
+  // if (dirDescriptor == 0) return -1;
+  if (dirDescriptor == 0)
+  {
+    // printf("ls.c->main()->dirDescriptor == 0\n");
+    exit();
+  }
 
   struct _DirectoryEntry *dirEntry;
+  dirEntry = malloc(32);
 
   readDirectory(dirDescriptor, dirEntry);
 
@@ -43,7 +55,7 @@ int main(int argc, char *argv[])
   // TODO:
   // if (argc > 1) ? openDirectory(argv[1]) : openDirectory("")
   // readDirectory(, dirEntry);
-  // closeDirectory();
+  closeDirectory(dirDescriptor);
 
 	exit();
 }
