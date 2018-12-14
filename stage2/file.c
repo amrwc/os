@@ -171,14 +171,26 @@ static int fdAllocate(File *f)
 
 int opendir(char *directory)
 {
-  int isSubdirectory = strlen(directory) == 0 ? 0 : 1;
+  // int isSubdirectory = strlen(directory) == 0 ? 0 : 1;
+  int isSubdirectory = directory ? 0 : 1; // If directory is not null, assign 1.
+  // cprintf("%d", isSubdirectory);
+  // cprintf("%d", strlen(directory));
+  // cprintf("file.c->opendir()->directory: %s\n", directory);
 
   char *cwd = myProcess()->Cwd;
   File *file = fsFat12Open(cwd, directory, isSubdirectory);
 
-  if (file == 0) return 0; // Return error.
+  if (file == 0)
+  {
+    cprintf("file == 0\n");
+    return 0; // Return error.
+  }
 
-  return fdAllocate(file);
+  int dirDesc = fdAllocate(file);
+  cprintf("file.c->opendir()->dirDesc: %d\n", dirDesc);
+
+  // return fdAllocate(file);
+  return dirDesc;
 }
 
 int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
