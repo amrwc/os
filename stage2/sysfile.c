@@ -251,7 +251,10 @@ int sys_chdir(void)
   char* directory;          // 1st argument storage.
 
   // Store the 1st(0) argument of size char in directory.
-  argptr(0, &directory, sizeof(int8_t));
+  if (argptr(0, &directory, sizeof(int8_t)) < 0)
+  {
+    return -1;
+  }
 
   // Call chdir from proc.c file.
   chdir(directory);
@@ -266,11 +269,17 @@ int sys_getcwd(void)
 
   // Take 1st(0) argument from stack of type pointer,
   // and store it in currentDirectory.
-  argptr(0, &currentDirectory, sizeof(int8_t));
+  if (argptr(0, &currentDirectory, sizeof(int8_t)) < 0)
+  {
+    return -1;
+  }
 
   // Take 2nd(1) argument from stack of type int,
   // and store it in sizeOfBuffer.
-  argint(1, &sizeOfBuffer);
+  if (argint(1, &sizeOfBuffer) < 0)
+  {
+    return -1;
+  }
 
   // Call getcwd from proc.c file.
   getcwd(currentDirectory, sizeOfBuffer);
@@ -282,7 +291,10 @@ int sys_opendir(void)
 {
   char* directory;
 
-  argptr(0, &directory, sizeof(int8_t));
+  if (argptr(0, &directory, sizeof(int8_t)) < 0)
+  {
+    return -1;
+  }
 
   opendir(directory);
 
@@ -294,8 +306,14 @@ int sys_readdir(void)
   int directoryDescriptor;
   struct _DirectoryEntry * dirEntry;
 
-  argint(0, &directoryDescriptor);
-  argptr(1, (void*)&dirEntry, sizeof(*dirEntry));
+  if (argint(0, &directoryDescriptor) < 0)
+  {
+    return -1;
+  }
+  if (argptr(1, (void*)&dirEntry, sizeof(*dirEntry)) < 0)
+  {
+    return -1;
+  }
 
   readdir(directoryDescriptor, dirEntry);
 
@@ -306,7 +324,10 @@ int sys_closedir(void)
 {
   int directoryDescriptor;
 
-  argint(0, &directoryDescriptor);
+  if (argint(0, &directoryDescriptor) < 0)
+  {
+    return -1;
+  }
 
   closedir(directoryDescriptor);
 
