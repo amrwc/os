@@ -67,6 +67,8 @@ void fileClose(File *f)
 {
 	File ff;
 
+  cprintf("%s  %d\n", f->Name, f->ReferenceCount);
+
 	spinlockAcquire(&FileTable.Lock);
 	if (f->ReferenceCount < 1)
 	{
@@ -162,7 +164,7 @@ static int fdAllocate(File *f)
 	{
 		if (curproc->OpenFile[fd] == 0) 
 		{
-			curproc->OpenFile[fd] = f;
+			curproc->OpenFile[fd] = f; // Put the file in the process table?
 			return fd;
 		}
 	}
@@ -182,15 +184,17 @@ int opendir(char *directory)
 
   if (file == 0)
   {
-    cprintf("file == 0\n");
-    return 0; // Return error.
+    cprintf("file.c->opendir()->file == 0\n");
+    return 0;
   }
 
-  int dirDesc = fdAllocate(file);
-  cprintf("file.c->opendir()->dirDesc: %d\n", dirDesc);
+  // int dirDesc = fdAllocate(file);
+  // cprintf("file.c->opendir()->dirDesc: %d\n", dirDesc);
+  // return dirDesc;
 
-  // return fdAllocate(file);
-  return dirDesc;
+  // cprintf("file.c->opendir(): file->ReferenceCount: %d\n", file->ReferenceCount);
+
+  return fdAllocate(file); // Return file descriptor.
 }
 
 int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
@@ -198,18 +202,31 @@ int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
   File *file = myProcess()->OpenFile[directoryDescriptor];
   char buffer[32];
 
-  if (fileRead(file, buffer, 32) < 0) return -1;
+  if (fileRead(file, buffer, 32) < 0)
+  {
+    cprintf("file.c->readdir()->fileRead: -1\n");
+    return -1;
+  }
 
   memmove(dirEntry, buffer, 32);
+
+  // cprintf("file.c->readdir(): file->ReferenceCount: %d\n", file->ReferenceCount);
 
   return 0;
 }
 
 int closedir(int directoryDescriptor)
 {
-  fileClose(myProcess()->OpenFile[directoryDescriptor]);
+  // File *file = myProcess()->OpenFile[directoryDescriptor];
+  cprintf("file.c->closedir(): file->ReferenceCount: %d\n", myProcess()->OpenFile[directoryDescriptor]->ReferenceCount);
 
-  if (myProcess()->OpenFile[directoryDescriptor]) return -1;
+  // if (myProcess()->OpenFile[directoryDescriptor]) return -1;
+  // fileClose(myProcess()->OpenFile[directoryDescriptor]);
+  // File *file = myProcess()->OpenFile[directoryDescriptor];
+
+  // fileClose(file);
+  fileClose(myProcess()->OpenFile[directoryDescriptor]);
+  myProcess()->OpenFile[directoryDescriptor] = 0;
 
   return 0;
 }
