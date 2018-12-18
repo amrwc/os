@@ -291,14 +291,15 @@ int sys_opendir(void)
 {
   char* directory;
 
-  if (argptr(0, &directory, sizeof(int8_t)) < 0)
+  // if (argptr(0, &directory, sizeof(int8_t)) < 0)
+  if (argptr(0, &directory, sizeof(*directory)) < 0)
   {
     return -1;
   }
 
-  opendir(directory);
+  // cprintf("sysfile.c->opendir()->directory: %s\n", directory);
 
-  return 0;
+  return opendir(directory);
 }
 
 int sys_readdir(void)
@@ -315,9 +316,7 @@ int sys_readdir(void)
     return -1;
   }
 
-  readdir(directoryDescriptor, dirEntry);
-
-  return 0;
+  return readdir(directoryDescriptor, dirEntry);
 }
 
 int sys_closedir(void)
@@ -329,7 +328,5 @@ int sys_closedir(void)
     return -1;
   }
 
-  closedir(directoryDescriptor);
-
-  return 0;
+  return closedir(directoryDescriptor);
 }
