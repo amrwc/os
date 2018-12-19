@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-  int dirDescriptor = opendir(argv[1]);
+  int dirDescriptor = (argc > 1) ? opendir(argv[1]) : opendir("");
 
   if (dirDescriptor == 0)
   {
@@ -13,13 +13,14 @@ int main(int argc, char *argv[])
   }
 
   struct _DirectoryEntry *dirEntry = malloc(32);
-  char name[8] = {0};
+  // char name[8] = {0};
   // char ext[3] = {0};
   // char name[9] = {0};
   // char ext[4] = {0};
   // char line[12] = {0};
+  char name[12] = {0};
   
-  int i;
+  int i = 0;
   // int j;
 
   for (;;)
@@ -29,12 +30,12 @@ int main(int argc, char *argv[])
       if (dirEntry->Filename[0] == 0) break;
 
       // memmove(name, &dirEntry->Filename, strlen((char*)dirEntry->Filename));
-      memmove(name, &dirEntry->Filename, 7);
+      memmove(name, &dirEntry->Filename, 8);
       // memmove(line, &dirEntry->Filename, 8);
       // memmove(line + strlen(line), &dirEntry->Ext, 3);
       
       // printf("%s", dirEntry->Filename[0]);
-      printf("%s\n", name);
+      // printf("%s\n", name);
       // for (j = 0; j < 8; j++)
       // {
       //   if (dirEntry->Filename[j] == 0)
@@ -43,11 +44,19 @@ int main(int argc, char *argv[])
       //     break;
       //   }
       // }
-      // if (j > 1)
+      // if (i > 1) // If past the '.' and '..'.
       // {
-      //   memmove(line + j, &dirEntry->Ext, 3);
-      //   break;
+      //   for (j = 1; j <= 12; j++)
+      //   {
+      //     // if (name + j == 0)
+      //     // {
+      //     //   memmove(name + j, &dirEntry->Ext, 3);
+      //     //   break;
+      //     // }
+      //     printf("%c", name + j);
+      //   }
       // }
+      printf("%s\n", name);
       // printf("%s", line);
 
 
@@ -61,10 +70,6 @@ int main(int argc, char *argv[])
 
     i++;
   }
-
-  // TODO:
-  // if (argc > 1) ? openDirectory(argv[1]) : openDirectory("")
-  // readDirectory(, dirEntry);
 
   if (closedir(dirDescriptor) != 0)
   {
