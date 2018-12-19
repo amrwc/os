@@ -2,55 +2,51 @@
 #include "user.h"
 #include "fs.h"
 
-int openDirectory(char *directory)
-{
-  return opendir(directory);
-}
-
-int readDirectory(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
-{
-  return readdir(directoryDescriptor, dirEntry);
-}
-
-int closeDirectory(int directoryDescriptor)
-{
-  return closedir(directoryDescriptor);
-}
-
 int main(int argc, char *argv[])
 {
-  int dirDescriptor = openDirectory(argv[1]);
+  int dirDescriptor;
+  // struct _DirectoryEntry *dirEntry = malloc(32);
 
-  if (dirDescriptor == 0)
-  {
-    printf("ls.c->main()->dirDescriptor == 0\n");
-    exit();
-  }
+  // for(;;)
+  // {
+    dirDescriptor = opendir(argv[1]);
 
-  // struct _DirectoryEntry *dirEntry;
-  // dirEntry = malloc(32);
-  struct _DirectoryEntry *dirEntry = malloc(32);
+    if (dirDescriptor == 0)
+    {
+      printf("ls.c->main()->dirDescriptor == 0\n");
+      exit();
+      // break;
+    }
 
-  readDirectory(dirDescriptor, dirEntry);
+    struct _DirectoryEntry *dirEntry = malloc(32);
+    char name[8] = {0};
+    char ext[3] = {0};
+    do
+    {
+      if (readdir(dirDescriptor, dirEntry) > -1)
+      {
+        memmove(name, &dirEntry->Filename, 7);
+        printf("%s ", name);
+        memmove(ext, &dirEntry->Ext, 3);
+        printf("%s ", ext);
+        printf("%d\n", dirEntry->FileSize);
+      }
 
-  printf("%s ", dirEntry->Filename);
-  // printf("%d\n", dirEntry->FileSize);
+      // printf("%s ", dirEntry->Filename);
+      // printf("%s\n", dirEntry->Ext);
+    } while(dirEntry->Filename[0] != 0);
 
-	// int i;
-	// for (i = 1; i < argc; i++)
-	// {
-	// 	printf("%s%s", argv[i], i + 1 < argc ? " " : "\n");
-	// }
+    // TODO:
+    // if (argc > 1) ? openDirectory(argv[1]) : openDirectory("")
+    // readDirectory(, dirEntry);
 
-  // TODO:
-  // if (argc > 1) ? openDirectory(argv[1]) : openDirectory("")
-  // readDirectory(, dirEntry);
-
-  if (closeDirectory(dirDescriptor) != 0)
-  {
-    printf("ls.c->main(): closeDirectory != 0\n");
-    exit();
-  }
+    if (closedir(dirDescriptor) != 0)
+    {
+      printf("ls.c->main(): closeDirectory() != 0\n");
+      exit();
+      // break;
+    }
+  // }
 
 	exit();
 }
