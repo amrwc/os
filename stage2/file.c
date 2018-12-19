@@ -171,8 +171,21 @@ static int fdAllocate(File *f)
 
 int opendir(char *directory)
 {
-  int isSubdirectory = directory ? 1 : 0; // If directory is not null, assign 1.
-  File *file = fsFat12Open(myProcess()->Cwd, directory, isSubdirectory);
+  int isSubdirectory;
+  File *file;
+
+  if (strlen(directory) > 0)
+  {
+    isSubdirectory = 1;
+    file = fsFat12Open(myProcess()->Cwd, directory, isSubdirectory);
+  }
+  else
+  {
+    isSubdirectory = 1;
+    char currentLocation[MAXCWDSIZE] = {0};
+    memmove(&currentLocation, myProcess()->Cwd, strlen(myProcess()->Cwd) - 1);
+    file = fsFat12Open(myProcess()->Cwd, currentLocation, isSubdirectory);
+  }
 
   if (file == 0)
   {
