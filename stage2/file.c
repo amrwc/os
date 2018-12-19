@@ -171,12 +171,8 @@ static int fdAllocate(File *f)
 
 int opendir(char *directory)
 {
-  // int isSubdirectory = strlen(directory) == 0 ? 0 : 1;
   int isSubdirectory = directory ? 1 : 0; // If directory is not null, assign 1.
-  // cprintf("file.c->opendir()->directory: %s\n", directory);
-
-  char *cwd = myProcess()->Cwd;
-  File *file = fsFat12Open(cwd, directory, isSubdirectory);
+  File *file = fsFat12Open(myProcess()->Cwd, directory, isSubdirectory);
 
   if (file == 0)
   {
@@ -190,19 +186,8 @@ int opendir(char *directory)
 int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
 {
   File *file = myProcess()->OpenFile[directoryDescriptor];
-  // file->Eof = 0; // This shouldn't be here.
-  // char buffer[32] = {0};
-
-  // cprintf("file->Position before: %d\n", file->Position);
-  // cprintf("file->Eof before: %d\n", file->Eof);
-  // int fileReadResult = fileRead(file, buffer, 32);
   int fileReadResult = fileRead(file, (char*)dirEntry, 32);
-  // int fileReadResult = fileRead(file, buffer, sizeof(File));
-  // cprintf("file->Position after: %d\n", file->Position);
-  // cprintf("file->Eof after: %d\n", file->Eof);
 
-  // if (fileRead(file, buffer, 32) < 0 || file->Eof == 1)
-  // if (fileRead(file, buffer, 32) < 0)
   if (fileReadResult < 0)
   {
     cprintf("file.c->readdir(): File not readable.\n");
@@ -213,42 +198,12 @@ int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
     cprintf("file.c->readdir(): Read no clusters.\n");
     return -1;
   }
-  // if (dirEntry->Filename[0] == '0')
-  if (dirEntry->Filename[0] == 0)
-  {
-    // cprintf("dirEntry->Filename[0] == 0\n");
-    return -1;
-  }
-  // if (buffer[0] == 0)
-  // // if (buffer[0] == '0')
-  // {
-  //   cprintf("buffer[0] == 0");
-  //   return -1;
-  // }
-
-  // memmove(dirEntry, buffer, 32);
-
-  // memmove(&dirEntry->Filename, &buffer[0], 8);
-  // memmove(&dirEntry->Ext, &buffer[8], 3);
-  // memmove(&dirEntry->Attrib, &buffer[11], 1);
-  // memmove(&dirEntry->Reserved, &buffer[12], 1);
-  // memmove(&dirEntry->TimeCreatedMs, &buffer[13], 1);
-  // memmove(&dirEntry->TimeCreated, &buffer[14], 2);
-  // memmove(&dirEntry->DateCreated, &buffer[16], 2);
-  // memmove(&dirEntry->DateLastAccessed, &buffer[18], 2);
-  // memmove(&dirEntry->FirstClusterHiBytes, &buffer[20], 2);
-  // memmove(&dirEntry->LastModTime, &buffer[22], 2);
-  // memmove(&dirEntry->LastModDate, &buffer[24], 2);
-  // memmove(&dirEntry->FirstCluster, &buffer[26], 2);
-  // memmove(&dirEntry->FileSize, &buffer[28], 4);
 
   return 0;
 }
 
 int closedir(int directoryDescriptor)
 {
-  // cprintf("file.c->closedir(): file->ReferenceCount: %d\n", myProcess()->OpenFile[directoryDescriptor]->ReferenceCount);
-
   fileClose(myProcess()->OpenFile[directoryDescriptor]);
   myProcess()->OpenFile[directoryDescriptor] = 0;
 
