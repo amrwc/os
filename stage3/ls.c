@@ -58,16 +58,49 @@ struct Dir openDirectory(int argc, char *argv[])
   return directory;
 }
 
-void printDirEntry(char *entryName, char *ext, int flag)
+void printDirEntryDetails(struct _DirectoryEntry *dirEntry, char *entryName)
 {
-  int i;
+  /** 
+   * Date:                                 Time:
+   *  15          9       5         0       15      11          5         0
+   * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   * |Y|Y|Y|Y|Y|Y|Y|M|M|M|M|D|D|D|D|D|     |h|h|h|h|h|m|m|m|m|m|m|s|s|s|s|s|
+   * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   * \____________/\______/\_________/     \________/\__________/\_________/
+   *      year      month      day            hour      minute     second
+   */
+
+  int dayCreated = dirEntry->DateCreated;
+  dayCreated = dayCreated & 0b0000000000011111;
+
+  int monthCreated = dirEntry->DateCreated;
+  monthCreated = monthCreated & 0b0000000111100000;
+  monthCreated = monthCreated >> 5;
+
+  int yearCreated = dirEntry->DateCreated;
+  yearCreated = (yearCreated >> 9) + 1980;
+
+  printf("%s ", entryName);
+  printf("%d/%d/%d ", dayCreated, monthCreated, yearCreated);
+  printf("%d ", dirEntry->TimeCreated);
+  printf("%d ", dirEntry->LastModDate);
+  printf("%d ", dirEntry->LastModTime);
+  printf("%db ", dirEntry->FileSize);
+  printf("%d\n", dirEntry->Attrib);
+}
+
+void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
+{
+  char entryName[12] = {0}, ext[4] = {0};
+  memmove(entryName, &dirEntry->Filename, 8);
+  memmove(ext, &dirEntry->Ext, 3);
 
   if (ext[0] == 0 || ext[0] == '.' || ext[0] == ' ')
   {
     // If it's a directory, append slash to the name.
     if (entryName[0] != '.')
     {
-      for (i = 0; i < strlen(entryName); i++)
+      for (int i = 0; i < strlen(entryName); i++)
       {
         if (entryName[i] == ' ' || entryName[i] == 0)
         {
@@ -75,18 +108,21 @@ void printDirEntry(char *entryName, char *ext, int flag)
           break;
         }
       }
-    }
-    printf("%s\n", entryName);
 
-    if (flag == 1)
+      if (flag == 1)
+      {
+        printDirEntryDetails(dirEntry, entryName);
+      }
+    }
+    else
     {
-      printf("Flag == \"-l\"\n");
+      printf("%s\n", entryName);
     }
   }
   else
   {
     // If the entry has an extension, append it to the name.
-    for (i = 0; i < strlen(entryName); i++)
+    for (int i = 0; i < strlen(entryName); i++)
     {
       if (entryName[i] == ' ' || entryName[i] == 0)
       {
@@ -95,11 +131,14 @@ void printDirEntry(char *entryName, char *ext, int flag)
         break;
       }
     }
-    printf("%s\n", entryName);
 
     if (flag == 1)
     {
-      printf("Flag == \"-l\"\n");
+      printDirEntryDetails(dirEntry, entryName);
+    }
+    else
+    {
+      printf("%s\n", entryName);
     }
   }
 }
@@ -115,7 +154,11 @@ int main(int argc, char *argv[])
   }
 
   struct _DirectoryEntry *dirEntry = malloc(32);
-  char entryName[12] = {0}, ext[4] = {0};
+
+  if (directory.flag == 1)
+  {
+    printf("Name     Created          Modified         Size       Attributes\n");
+  }
 
   for (;;)
   {
@@ -125,10 +168,7 @@ int main(int argc, char *argv[])
       // we reached the end of the directory.
       if (dirEntry->Filename[0] == 0) break;
 
-      memmove(entryName, &dirEntry->Filename, 8);
-      memmove(ext, &dirEntry->Ext, 3);
-
-      printDirEntry(entryName, ext, directory.flag);
+      printDirEntry(dirEntry, directory.flag);
     }
     else
     {
