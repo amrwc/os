@@ -58,7 +58,7 @@ struct Dir openDirectory(int argc, char *argv[])
   return directory;
 }
 
-void printDirEntryDetails(struct _DirectoryEntry *dirEntry, char *entryName)
+void printDirEntryDetails(struct _DirectoryEntry *dirEntry)
 {
   /** 
    * Date:                                 Time:
@@ -70,22 +70,31 @@ void printDirEntryDetails(struct _DirectoryEntry *dirEntry, char *entryName)
    *      year      month      day            hour      minute     second
    */
 
-  int dayCreated = dirEntry->DateCreated;
-  dayCreated = dayCreated & 0b0000000000011111;
+  int dayCreated = dirEntry->DateCreated & 0b0000000000011111;
+  int monthCreated = (dirEntry->DateCreated & 0b0000000111100000) >> 5;
+  int yearCreated = (dirEntry->DateCreated >> 9) + 1980;
 
-  int monthCreated = dirEntry->DateCreated;
-  monthCreated = monthCreated & 0b0000000111100000;
-  monthCreated = monthCreated >> 5;
+  int minuteCreated = (dirEntry->TimeCreated & 0b0000011111100000) >> 5;
+  int hourCreated = dirEntry->TimeCreated >> 11;
 
-  int yearCreated = dirEntry->DateCreated;
-  yearCreated = (yearCreated >> 9) + 1980;
+  int dayModified = dirEntry->LastModDate & 0b0000000000011111;
+  int monthModified = (dirEntry->LastModDate & 0b0000000111100000) >> 5;
+  int yearModified = (dirEntry->LastModDate >> 9) + 1980;
 
-  printf("%s ", entryName);
+  int minuteModified = (dirEntry->LastModTime & 0b0000011111100000) >> 5;
+  int hourModified = dirEntry->LastModTime >> 11;
+
   printf("%d/%d/%d ", dayCreated, monthCreated, yearCreated);
-  printf("%d ", dirEntry->TimeCreated);
-  printf("%d ", dirEntry->LastModDate);
-  printf("%d ", dirEntry->LastModTime);
-  printf("%db ", dirEntry->FileSize);
+  (minuteCreated < 10)
+    ? printf("%d:0%d  ", hourCreated, minuteCreated)
+    : printf("%d:%d  ", hourCreated, minuteCreated);
+
+  printf("%d/%d/%d ", dayModified, monthModified, yearModified);
+  (minuteModified < 10)
+    ? printf("%d:0%d  ", hourModified, minuteModified)
+    : printf("%d:%d  ", hourModified, minuteModified);
+
+  printf("%db  ", dirEntry->FileSize);
   printf("%d\n", dirEntry->Attrib);
 }
 
@@ -111,7 +120,8 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
 
       if (flag == 1)
       {
-        printDirEntryDetails(dirEntry, entryName);
+        printf("%s ", entryName);
+        printDirEntryDetails(dirEntry);
       }
     }
     else
@@ -134,7 +144,8 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
 
     if (flag == 1)
     {
-      printDirEntryDetails(dirEntry, entryName);
+      printf("%s ", entryName);
+      printDirEntryDetails(dirEntry);
     }
     else
     {
@@ -157,7 +168,7 @@ int main(int argc, char *argv[])
 
   if (directory.flag == 1)
   {
-    printf("Name     Created          Modified         Size       Attributes\n");
+    printf("Name     Created           Modified          Size        Attributes\n");
   }
 
   for (;;)
