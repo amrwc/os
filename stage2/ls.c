@@ -65,9 +65,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (closedir(dirDescriptor) != 0)
+  if (closedir(dirDescriptor) == -1)
   {
-    printf("ls.c->main(): closedir() != 0\n");
+    printf("ls.c->main(): closedir() == -1\n");
   }
 
 	exit();
