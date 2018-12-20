@@ -2,11 +2,68 @@
 #include "user.h"
 #include "fs.h"
 
+struct Dir
+{
+  int dirDescriptor;
+  int flag;
+};
+
+struct Dir openDirectory(int argc, char *argv[])
+{
+  int dirDescriptor = 0;
+  int flag = 0; // Flags: "-l":= 1
+
+  if (argc == 1)
+  {
+    // Empty ls
+    dirDescriptor = opendir("");
+  }
+  else
+  {
+    if (argv[1][0] == '-')
+    {
+      // If 2nd argument is a flag...
+      switch (argv[1][1])
+      {
+        case 'l' :
+          flag = 1;
+          break;
+        default :
+          break;
+      }
+
+      dirDescriptor = opendir("");
+    }
+    else if (argv[2][0] == '-')
+    {
+      // If 3rd argument is a flag...
+      switch (argv[2][1])
+      {
+        case 'l' :
+          flag = 1;
+          break;
+        default :
+          break;
+      }
+
+      dirDescriptor = opendir(argv[1]);
+    }
+    else
+    {
+      dirDescriptor = opendir(argv[1]);
+    }
+  }
+
+  struct Dir directory = {dirDescriptor, flag};
+
+  return directory;
+}
+
 int main(int argc, char *argv[])
 {
-  int dirDescriptor = (argc > 1) ? opendir(argv[1]) : opendir("");
+  struct Dir directory = openDirectory(argc, argv);
 
-  if (dirDescriptor == 0)
+  if (directory.dirDescriptor == 0)
   {
     printf("ls.c->main()->dirDescriptor == 0\n");
     exit();
@@ -18,7 +75,7 @@ int main(int argc, char *argv[])
 
   for (;;)
   {
-    if (readdir(dirDescriptor, dirEntry) > -1)
+    if (readdir(directory.dirDescriptor, dirEntry) > -1)
     {
       // If the Filename starts with zero,
       // we reached the end of the directory.
@@ -42,6 +99,11 @@ int main(int argc, char *argv[])
           }
         }
         printf("%s\n", entryName);
+
+        if (directory.flag == 1)
+        {
+          printf("Flag == \"-l\"\n");
+        }
       }
       else
       {
@@ -56,6 +118,11 @@ int main(int argc, char *argv[])
           }
         }
         printf("%s\n", entryName);
+
+        if (directory.flag == 1)
+        {
+          printf("Flag == \"-l\"\n");
+        }
       }
     }
     else
@@ -65,9 +132,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (closedir(dirDescriptor) != 0)
+  if (closedir(directory.dirDescriptor) == -1)
   {
-    printf("ls.c->main(): closedir() != 0\n");
+    printf("ls.c->main(): closedir() == -1\n");
   }
 
 	exit();
