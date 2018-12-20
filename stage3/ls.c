@@ -94,8 +94,14 @@ void printDirEntryDetails(struct _DirectoryEntry *dirEntry)
     ? printf("%d:0%d  ", hourModified, minuteModified)
     : printf("%d:%d  ", hourModified, minuteModified);
 
-  printf("%db  ", dirEntry->FileSize);
-  printf("%d\n", dirEntry->Attrib);
+  (dirEntry->Attrib & 0b00000001) ? printf("r") : printf("-");      // read only
+  (dirEntry->Attrib & 0b00000010) ? printf("h") : printf("-");      // hidden
+  (dirEntry->Attrib & 0b00000100) ? printf("s") : printf("-");      // system
+  (dirEntry->Attrib & 0b00001000) ? printf("v") : printf("-");      // volume label
+  (dirEntry->Attrib & 0b00010000) ? printf("s") : printf("-");      // subdirectory
+  (dirEntry->Attrib & 0b00100000) ? printf("a  ") : printf("-  ");  // archive
+
+  printf("%db\n", dirEntry->FileSize);
 }
 
 void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
@@ -120,7 +126,7 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
 
       if (flag == 1)
       {
-        printf("%s ", entryName);
+        printf("%s  ", entryName);
         printDirEntryDetails(dirEntry);
       }
     }
@@ -144,7 +150,7 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
 
     if (flag == 1)
     {
-      printf("%s ", entryName);
+      printf("%s  ", entryName);
       printDirEntryDetails(dirEntry);
     }
     else
@@ -168,7 +174,7 @@ int main(int argc, char *argv[])
 
   if (directory.flag == 1)
   {
-    printf("Name     Created           Modified          Size        Attributes\n");
+    printf("Name      Created           Modified          Attrib  Size\n");
   }
 
   for (;;)
