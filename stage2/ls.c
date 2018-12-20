@@ -58,11 +58,16 @@ int main(int argc, char *argv[])
         printf("%s\n", entryName);
       }
     }
+    else
+    {
+      printf("ls.c->main(): readdir() <= -1\n");
+      exit();
+    }
   }
 
   if (closedir(dirDescriptor) != 0)
   {
-    printf("ls.c->main(): closeDirectory() != 0\n");
+    printf("ls.c->main(): closedir() != 0\n");
   }
 
 	exit();
