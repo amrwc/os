@@ -13,68 +13,56 @@ int main(int argc, char *argv[])
   }
 
   struct _DirectoryEntry *dirEntry = malloc(32);
-  // char name[8] = {0};
-  // char ext[3] = {0};
-  // char name[9] = {0};
-  // char ext[4] = {0};
-  // char line[12] = {0};
-  char name[12] = {0};
-  
-  int i = 0;
-  // int j;
+  char entryName[12] = {0}, ext[4] = {0};
+  int i;
 
   for (;;)
   {
     if (readdir(dirDescriptor, dirEntry) > -1)
     {
+      // If the Filename starts with zero,
+      // we reached the end of the directory.
       if (dirEntry->Filename[0] == 0) break;
 
-      // memmove(name, &dirEntry->Filename, strlen((char*)dirEntry->Filename));
-      memmove(name, &dirEntry->Filename, 8);
-      // memmove(line, &dirEntry->Filename, 8);
-      // memmove(line + strlen(line), &dirEntry->Ext, 3);
-      
-      // printf("%s", dirEntry->Filename[0]);
-      // printf("%s\n", name);
-      // for (j = 0; j < 8; j++)
-      // {
-      //   if (dirEntry->Filename[j] == 0)
-      //   {
-      //     memmove(line, &dirEntry->Filename, j);
-      //     break;
-      //   }
-      // }
-      // if (i > 1) // If past the '.' and '..'.
-      // {
-      //   for (j = 1; j <= 12; j++)
-      //   {
-      //     // if (name + j == 0)
-      //     // {
-      //     //   memmove(name + j, &dirEntry->Ext, 3);
-      //     //   break;
-      //     // }
-      //     printf("%c", name + j);
-      //   }
-      // }
-      printf("%s\n", name);
-      // printf("%s", line);
+      memmove(entryName, &dirEntry->Filename, 8);
+      memmove(ext, &dirEntry->Ext, 3);
 
-
-      // printf("%s.", name);
-      // memmove(ext, &dirEntry->Ext, strlen((char*)dirEntry->Ext));
-      // memmove(ext, &dirEntry->Ext, 3);
-      // printf("%s\n", ext);
-      // printf("%s.", dirEntry->Filename);
-      // printf("%s\n", dirEntry->Ext);
+      if (ext[0] == 0 || ext[0] == '.' || ext[0] == ' ')
+      {
+        // If it's a directory, append slash to the name.
+        if (entryName[0] != '.')
+        {
+          for (i = 0; i < strlen(entryName); i++)
+          {
+            if (entryName[i] == ' ' || entryName[i] == 0)
+            {
+              entryName[i] = '/';
+              break;
+            }
+          }
+        }
+        printf("%s\n", entryName);
+      }
+      else
+      {
+        // If the entry has an extension, append it to the name.
+        for (i = 0; i < strlen(entryName); i++)
+        {
+          if (entryName[i] == ' ' || entryName[i] == 0)
+          {
+            entryName[i] = '.';
+            memmove(entryName + i + 1, ext, strlen(ext));
+            break;
+          }
+        }
+        printf("%s\n", entryName);
+      }
     }
-
-    i++;
   }
 
   if (closedir(dirDescriptor) != 0)
   {
     printf("ls.c->main(): closeDirectory() != 0\n");
-    exit();
   }
 
 	exit();
