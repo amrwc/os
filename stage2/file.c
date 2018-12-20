@@ -183,7 +183,10 @@ int opendir(char *directory)
   {
     isSubdirectory = 1;
     char currentLocation[MAXCWDSIZE] = {0};
+
+    // Get current location without the trailing slash.
     memmove(&currentLocation, myProcess()->Cwd, strlen(myProcess()->Cwd) - 1);
+
     file = fsFat12Open(myProcess()->Cwd, currentLocation, isSubdirectory);
   }
 
