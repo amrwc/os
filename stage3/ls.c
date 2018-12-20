@@ -110,11 +110,13 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
   memmove(entryName, &dirEntry->Filename, 8);
   memmove(ext, &dirEntry->Ext, 3);
 
+  // If it's a subdirectory...
   if (ext[0] == 0 || ext[0] == '.' || ext[0] == ' ')
   {
-    // If it's a directory, append slash to the name.
+    // ...and if it's not a 'dot entry'...
     if (entryName[0] != '.')
     {
+      // ...append slash to the name.
       for (int i = 0; i < strlen(entryName); i++)
       {
         if (entryName[i] == ' ' || entryName[i] == 0)
@@ -124,18 +126,24 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
         }
       }
 
-      if (flag == 1)
+      if (flag == 1) // if '-l'
       {
         printf("%s  ", entryName);
         printDirEntryDetails(dirEntry);
       }
+      else
+      {
+        // If no flags, display only the subdirectory's name.
+        printf("%s\n", entryName);
+      }
     }
     else
     {
+      // Display 'dot entries'.
       printf("%s\n", entryName);
     }
   }
-  else
+  else // If it's not a subdirectory...
   {
     // If the entry has an extension, append it to the name.
     for (int i = 0; i < strlen(entryName); i++)
@@ -148,13 +156,14 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
       }
     }
 
-    if (flag == 1)
+    if (flag == 1) // if '-l'
     {
       printf("%s  ", entryName);
       printDirEntryDetails(dirEntry);
     }
     else
     {
+      // If no flags, display the file's name with extension .
       printf("%s\n", entryName);
     }
   }
