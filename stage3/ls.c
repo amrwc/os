@@ -102,32 +102,6 @@ void printDirEntryDetails(struct _DirectoryEntry *dirEntry)
       ? printf("%d:%d:0%d  ", hour, minute, second)
       : printf("%d:%d:%d  ", hour, minute, second);
 
-  // int dayCreated = dirEntry->DateCreated & 0b0000000000011111;
-  // int monthCreated = (dirEntry->DateCreated & 0b0000000111100000) >> 5;
-  // int yearCreated = (dirEntry->DateCreated >> 9) + 1980;
-
-  // int secondCreated = dirEntry->TimeCreated & 0b0000000000011111;
-  // int minuteCreated = (dirEntry->TimeCreated & 0b0000011111100000) >> 5;
-  // int hourCreated = dirEntry->TimeCreated >> 11;
-
-  // int dayModified = dirEntry->LastModDate & 0b0000000000011111;
-  // int monthModified = (dirEntry->LastModDate & 0b0000000111100000) >> 5;
-  // int yearModified = (dirEntry->LastModDate >> 9) + 1980;
-
-  // int secondModified = dirEntry->LastModTime & 0b0000000000011111;
-  // int minuteModified = (dirEntry->LastModTime & 0b0000011111100000) >> 5;
-  // int hourModified = dirEntry->LastModTime >> 11;
-
-  // printf("%d/%d/%d ", dayCreated, monthCreated, yearCreated);
-  // (minuteCreated < 10)
-  //   ? printf("%d:0%d  ", hourCreated, minuteCreated)
-  //   : printf("%d:%d  ", hourCreated, minuteCreated);
-
-  // printf("%d/%d/%d ", dayModified, monthModified, yearModified);
-  // (minuteModified < 10)
-  //   ? printf("%d:0%d  ", hourModified, minuteModified)
-  //   : printf("%d:%d  ", hourModified, minuteModified);
-
   (dirEntry->Attrib & 0b00000001) ? printf("r") : printf("-");      // read only
   (dirEntry->Attrib & 0b00000010) ? printf("h") : printf("-");      // hidden
   (dirEntry->Attrib & 0b00000100) ? printf("s") : printf("-");      // system
