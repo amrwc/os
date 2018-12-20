@@ -173,11 +173,12 @@ int opendir(char *directory)
 {
   int isSubdirectory;
   File *file;
+  char *cwd = myProcess()->Cwd;
 
   if (strlen(directory) > 0)
   {
     isSubdirectory = 1;
-    file = fsFat12Open(myProcess()->Cwd, directory, isSubdirectory);
+    file = fsFat12Open(cwd, directory, isSubdirectory);
   }
   else
   {
@@ -185,9 +186,9 @@ int opendir(char *directory)
     char currentLocation[MAXCWDSIZE] = {0};
 
     // Get current location without the trailing slash.
-    memmove(&currentLocation, myProcess()->Cwd, strlen(myProcess()->Cwd) - 1);
+    memmove(&currentLocation, cwd, strlen(cwd) - 1);
 
-    file = fsFat12Open(myProcess()->Cwd, currentLocation, isSubdirectory);
+    file = fsFat12Open(cwd, currentLocation, isSubdirectory);
   }
 
   if (file == 0)
