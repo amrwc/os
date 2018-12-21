@@ -221,6 +221,8 @@ int readdir(int directoryDescriptor, struct _DirectoryEntry *dirEntry)
 
 int closedir(int directoryDescriptor)
 {
+  if (directoryDescriptor == 0) return -1;
+
   fileClose(myProcess()->OpenFile[directoryDescriptor]);
   myProcess()->OpenFile[directoryDescriptor] = 0;
 
