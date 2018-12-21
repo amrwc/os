@@ -171,24 +171,43 @@ static int fdAllocate(File *f)
 
 int opendir(char *directory)
 {
-  int isSubdirectory;
+  int isSubdirectory; // fsFat12Open(): '1 if we are opening a sub-directory, 0 otherwise'
   File *file;
   char *cwd = myProcess()->Cwd;
 
   if (strlen(directory) > 0)
   {
-    isSubdirectory = 1;
-    file = fsFat12Open(cwd, directory, isSubdirectory);
+    if (strlen(cwd) != 1) // If not in root.
+    {
+      isSubdirectory = 1;
+      file = fsFat12Open(cwd, directory, isSubdirectory);
+    }
+    else
+    {
+      // ls in root with subdirectory specified
+      isSubdirectory = 1;
+      file = fsFat12Open(cwd, directory, isSubdirectory);
+    }
   }
   else
   {
-    isSubdirectory = 1;
-    char currentLocation[MAXCWDSIZE] = {0};
+    if (strlen(cwd) != 1) // If not in root.
+    {
+      isSubdirectory = 1;
+      char currentLocation[MAXCWDSIZE] = {0};
 
-    // Get current location without the trailing slash.
-    memmove(&currentLocation, cwd, strlen(cwd) - 1);
+      // Get current location without the trailing slash.
+      memmove(&currentLocation, cwd, strlen(cwd) - 1);
 
-    file = fsFat12Open(cwd, currentLocation, isSubdirectory);
+      file = fsFat12Open(cwd, currentLocation, isSubdirectory);
+    }
+    else
+    {
+      // Empty ls in root
+      // NOTE: Doesn't work. Something has to be changed, maybe the arguments?
+      isSubdirectory = 0;
+      file = fsFat12Open(cwd, cwd, isSubdirectory);
+    }
   }
 
   if (file == 0)
