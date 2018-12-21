@@ -2,13 +2,13 @@
 #include "user.h"
 #include "fs.h"
 
-struct Dir
+typedef struct Dir
 {
   int dirDescriptor;
   int flag;
-};
+} Dir;
 
-struct Dir openDirectory(int argc, char *argv[])
+Dir openDirectory(int argc, char *argv[])
 {
   int dirDescriptor = 0;
   int flag = 0; // Flags: "-l":= 1
@@ -54,7 +54,7 @@ struct Dir openDirectory(int argc, char *argv[])
     }
   }
 
-  struct Dir directory = {dirDescriptor, flag};
+  Dir directory = {dirDescriptor, flag};
   return directory;
 }
 
@@ -70,29 +70,37 @@ void printDirEntryDetails(struct _DirectoryEntry *dirEntry)
    *      year      month      day            hour      minute     second
    */
 
-  int dayCreated = dirEntry->DateCreated & 0b0000000000011111;
-  int monthCreated = (dirEntry->DateCreated & 0b0000000111100000) >> 5;
-  int yearCreated = (dirEntry->DateCreated >> 9) + 1980;
+  int day = dirEntry->DateCreated & 0b0000000000011111;
+  int month = (dirEntry->DateCreated & 0b0000000111100000) >> 5;
+  int year = (dirEntry->DateCreated >> 9) + 1980;
+  printf("%d/%d/%d ", day, month, year);
 
-  int minuteCreated = (dirEntry->TimeCreated & 0b0000011111100000) >> 5;
-  int hourCreated = dirEntry->TimeCreated >> 11;
+  int second = (dirEntry->TimeCreated & 0b0000000000011111) * 2;
+  int minute = (dirEntry->TimeCreated & 0b0000011111100000) >> 5;
+  int hour = dirEntry->TimeCreated >> 11;
+  (minute < 10)
+    ? (second < 10)
+      ? printf("%d:0%d:0%d  ", hour, minute, second)
+      : printf("%d:0%d:%d  ", hour, minute, second)
+    : (second < 10)
+      ? printf("%d:%d:0%d  ", hour, minute, second)
+      : printf("%d:%d:%d  ", hour, minute, second);
 
-  int dayModified = dirEntry->LastModDate & 0b0000000000011111;
-  int monthModified = (dirEntry->LastModDate & 0b0000000111100000) >> 5;
-  int yearModified = (dirEntry->LastModDate >> 9) + 1980;
+  day = dirEntry->LastModDate & 0b0000000000011111;
+  month = (dirEntry->LastModDate & 0b0000000111100000) >> 5;
+  year = (dirEntry->LastModDate >> 9) + 1980;
+  printf("%d/%d/%d ", day, month, year);
 
-  int minuteModified = (dirEntry->LastModTime & 0b0000011111100000) >> 5;
-  int hourModified = dirEntry->LastModTime >> 11;
-
-  printf("%d/%d/%d ", dayCreated, monthCreated, yearCreated);
-  (minuteCreated < 10)
-    ? printf("%d:0%d  ", hourCreated, minuteCreated)
-    : printf("%d:%d  ", hourCreated, minuteCreated);
-
-  printf("%d/%d/%d ", dayModified, monthModified, yearModified);
-  (minuteModified < 10)
-    ? printf("%d:0%d  ", hourModified, minuteModified)
-    : printf("%d:%d  ", hourModified, minuteModified);
+  second = (dirEntry->LastModTime & 0b0000000000011111) * 2;
+  minute = (dirEntry->LastModTime & 0b0000011111100000) >> 5;
+  hour = dirEntry->LastModTime >> 11;
+  (minute < 10)
+    ? (second < 10)
+      ? printf("%d:0%d:0%d  ", hour, minute, second)
+      : printf("%d:0%d:%d  ", hour, minute, second)
+    : (second < 10)
+      ? printf("%d:%d:0%d  ", hour, minute, second)
+      : printf("%d:%d:%d  ", hour, minute, second);
 
   (dirEntry->Attrib & 0b00000001) ? printf("r") : printf("-");      // read only
   (dirEntry->Attrib & 0b00000010) ? printf("h") : printf("-");      // hidden
@@ -110,11 +118,13 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
   memmove(entryName, &dirEntry->Filename, 8);
   memmove(ext, &dirEntry->Ext, 3);
 
+  // If it's a subdirectory...
   if (ext[0] == 0 || ext[0] == '.' || ext[0] == ' ')
   {
-    // If it's a directory, append slash to the name.
+    // ...and if it's not a 'dot entry'...
     if (entryName[0] != '.')
     {
+      // ...append slash to the name.
       for (int i = 0; i < strlen(entryName); i++)
       {
         if (entryName[i] == ' ' || entryName[i] == 0)
@@ -124,18 +134,24 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
         }
       }
 
-      if (flag == 1)
+      if (flag == 1) // if '-l'
       {
         printf("%s  ", entryName);
         printDirEntryDetails(dirEntry);
       }
+      else
+      {
+        // If no flags, display only the subdirectory's name.
+        printf("%s\n", entryName);
+      }
     }
     else
     {
+      // Display 'dot entries'.
       printf("%s\n", entryName);
     }
   }
-  else
+  else // If it's not a subdirectory...
   {
     // If the entry has an extension, append it to the name.
     for (int i = 0; i < strlen(entryName); i++)
@@ -148,13 +164,14 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
       }
     }
 
-    if (flag == 1)
+    if (flag == 1) // if '-l'
     {
       printf("%s  ", entryName);
       printDirEntryDetails(dirEntry);
     }
     else
     {
+      // If no flags, display the file's name with extension .
       printf("%s\n", entryName);
     }
   }
@@ -162,7 +179,7 @@ void printDirEntry(struct _DirectoryEntry *dirEntry, int flag)
 
 int main(int argc, char *argv[])
 {
-  struct Dir directory = openDirectory(argc, argv);
+  Dir directory = openDirectory(argc, argv);
 
   if (directory.dirDescriptor == 0)
   {
@@ -174,7 +191,7 @@ int main(int argc, char *argv[])
 
   if (directory.flag == 1)
   {
-    printf("Name      Created           Modified          Attrib  Size\n");
+    printf("Name      Created              Modified             Attrib  Size\n");
   }
 
   for (;;)

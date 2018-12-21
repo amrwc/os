@@ -291,13 +291,10 @@ int sys_opendir(void)
 {
   char* directory;
 
-  // if (argptr(0, &directory, sizeof(int8_t)) < 0)
   if (argptr(0, &directory, sizeof(*directory)) < 0)
   {
-    return -1;
+    return 0;
   }
-
-  // cprintf("sysfile.c->opendir()->directory: %s\n", directory);
 
   return opendir(directory);
 }
