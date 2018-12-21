@@ -55,6 +55,13 @@ struct backcmd
 	struct cmd *cmd;
 };
 
+void getCurrentDirectory(char * buffer, int bufferSize)
+{
+	buffer[0] = 0;
+
+  getcwd(buffer, bufferSize);
+}
+
 int fork1(void);  // Fork but panics on failure.
 void panic(char*);
 struct cmd *parsecmd(char*);
@@ -84,8 +91,21 @@ void runcmd(struct cmd *cmd)
 			{
 				exit();
 			}
-			exec(ecmd->argv[0], ecmd->argv);
-			printf("exec %s failed\n", ecmd->argv[0]);
+
+      char cwd[255];
+      getCurrentDirectory(cwd, 255);
+
+      // If the comand is 'ls' and cwd is the root root...
+      if (ecmd->argv[0][0] == 'l' && ecmd->argv[0][1] == 's' && cwd[0] == '/' && strlen(cwd) == 1)
+      {
+        exec("/usrbin/ls.exe", ecmd->argv);
+        printf("exec ls failed\n");
+      }
+      else
+      {
+			  exec(ecmd->argv[0], ecmd->argv);
+			  printf("exec %s failed\n", ecmd->argv[0]);
+      }
 			break;
 
 		case REDIR:
@@ -151,13 +171,6 @@ void runcmd(struct cmd *cmd)
 void changeDirectory(char * path)
 {
   chdir(path);
-}
-
-void getCurrentDirectory(char * buffer, int bufferSize)
-{
-	buffer[0] = 0;
-
-  getcwd(buffer, bufferSize);
 }
 
 // getcwd returns cwd in buffer, which is printed to the console,
